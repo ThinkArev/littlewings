@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Little Wiings Play School Feedback Form</title>
+    <link rel="stylesheet" href="feedback.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="favicon.png" class="logo" alt="Little Wings Play School Logo">
+            <h1 class="title">Little Wings Play School</h1>
+            <h4>🌟Feedback🌟</h4>
+            <p class="subtitle">Help us make learning even more wonderful for your child!</p>
+        </div>
+
+        <div class="form-content">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+
+            <form id="feedbackForm" method="POST" enctype="multipart/form-data">
+                <!-- Formsubmit.co Configuration -->
+                <input type="hidden" name="_captcha" value="true"> <!-- Enable Captcha -->
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_subject" value="New Little Wings Feedback Submission">
+                <input type="hidden" name="_next" id="nextUrl" value="">
+                <input type="hidden" name="_honey" style="display:none">
+                <input type="hidden" name="message" id="formattedMessage">
+
+                <!-- Hidden inputs for ratings -->
+                <input type="hidden" name="rating_teaching" id="input_teaching">
+                <input type="hidden" name="rating_safety" id="input_safety">
+                <input type="hidden" name="rating_communication" id="input_communication">
+                <input type="hidden" name="rating_facilities" id="input_facilities">
+                <input type="hidden" name="rating_staff" id="input_staff">
+                <input type="hidden" name="rating_overall" id="input_overall">
+
+                <div class="form-section">
+                    <h3 class="section-title">Basic Information</h3>
+
+                    <div class="privacy-notice">
+                        <p>🔒 <strong>Your Privacy Matters:</strong> All feedback will be kept strictly confidential and
+                            shared only with school management for improvement purposes. Your identity will be
+                            protected.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-item anonymous-option">
+                            <input type="checkbox" id="anonymous" name="anonymous">
+                            <span>Submit this feedback anonymously</span>
+                        </label>
+                    </div>
+
+                    <div id="personalInfo">
+                        <div class="form-group">
+                            <label for="parentName">Parent/Guardian Name <span class="required">*</span></label>
+                            <input type="text" id="parentName" name="parentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="childName">Child's Name <span class="required">*</span></label>
+                            <input type="text" id="childName" name="childName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="childClass">Class/Age Group <span class="required">*</span></label>
+                        <select id="childClass" name="childClass" required>
+                            <option value="">Select Class</option>
+                            <option value="nursery">Nursery (2-3 years)</option>
+                            <option value="junior-kg">Junior KG (3-4 years)</option>
+                            <option value="senior-kg">Senior KG (4-5 years)</option>
+                            <option value="prep">Prep (5-6 years)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Rate Our Services</h3>
+                    <div class="rating-container">
+                        <div class="rating-item">
+                            <div class="rating-label">Teaching Quality <span class="required">*</span></div>
+                            <div class="emoji-rating" data-rating="teaching">
+                                <span class="emoji-option" data-value="1">😞</span>
+                                <span class="emoji-option" data-value="2">😐</span>
+                                <span class="emoji-option" data-value="3">🙂</span>
+                                <span class="emoji-option" data-value="4">😊</span>
+                                <span class="emoji-option" data-value="5">🤩</span>
+                            </div>
+                            <div class="rating-labels">
+                                <span>Poor</span>
+                                <span>Fair</span>
+                                <span>Good</span>
+                                <span>Great</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                        <div class="rating-item">
+                            <div class="rating-label">Safety & Security <span class="required">*</span></div>
+                            <div class="emoji-rating" data-rating="safety">
+                                <span class="emoji-option" data-value="1">😞</span>
+                                <span class="emoji-option" data-value="2">😐</span>
+                                <span class="emoji-option" data-value="3">🙂</span>
+                                <span class="emoji-option" data-value="4">😊</span>
+                                <span class="emoji-option" data-value="5">🤩</span>
+                            </div>
+                            <div class="rating-labels">
+                                <span>Poor</span>
+                                <span>Fair</span>
+                                <span>Good</span>
+                                <span>Great</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                        <div class="rating-item">
+                            <div class="rating-label">Communication <span class="required">*</span></div>
+                            <div class="emoji-rating" data-rating="communication">
+                                <span class="emoji-option" data-value="1">😞</span>
+                                <span class="emoji-option" data-value="2">😐</span>
+                                <span class="emoji-option" data-value="3">🙂</span>
+                                <span class="emoji-option" data-value="4">😊</span>
+                                <span class="emoji-option" data-value="5">🤩</span>
+                            </div>
+                            <div class="rating-labels">
+                                <span>Poor</span>
+                                <span>Fair</span>
+                                <span>Good</span>
+                                <span>Great</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                        <div class="rating-item">
+                            <div class="rating-label">Facilities & Cleanliness <span class="required">*</span></div>
+                            <div class="emoji-rating" data-rating="facilities">
+                                <span class="emoji-option" data-value="1">😞</span>
+                                <span class="emoji-option" data-value="2">😐</span>
+                                <span class="emoji-option" data-value="3">🙂</span>
+                                <span class="emoji-option" data-value="4">😊</span>
+                                <span class="emoji-option" data-value="5">🤩</span>
+                            </div>
+                            <div class="rating-labels">
+                                <span>Poor</span>
+                                <span>Fair</span>
+                                <span>Good</span>
+                                <span>Great</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                        <div class="rating-item">
+                            <div class="rating-label">Staff Behavior <span class="required">*</span></div>
+                            <div class="emoji-rating" data-rating="staff">
+                                <span class="emoji-option" data-value="1">😞</span>
+                                <span class="emoji-option" data-value="2">😐</span>
+                                <span class="emoji-option" data-value="3">🙂</span>
+                                <span class="emoji-option" data-value="4">😊</span>
+                                <span class="emoji-option" data-value="5">🤩</span>
+                            </div>
+                            <div class="rating-labels">
+                                <span>Poor</span>
+                                <span>Fair</span>
+                                <span>Good</span>
+                                <span>Great</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                        <div class="rating-item">
+                            <div class="rating-label">Overall Satisfaction <span class="required">*</span></div>
+                            <div class="emoji-rating" data-rating="overall">
+                                <span class="emoji-option" data-value="1">😞</span>
+                                <span class="emoji-option" data-value="2">😐</span>
+                                <span class="emoji-option" data-value="3">🙂</span>
+                                <span class="emoji-option" data-value="4">😊</span>
+                                <span class="emoji-option" data-value="5">🤩</span>
+                            </div>
+                            <div class="rating-labels">
+                                <span>Poor</span>
+                                <span>Fair</span>
+                                <span>Good</span>
+                                <span>Great</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" id="loveSection">
+                    <h3 class="section-title">What do you love most about our school?<span class="required">*</span>
+                    </h3>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="loves" value="caring-teachers">
+                            <span>Caring Teachers</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="loves" value="safe-environment">
+                            <span>Safe Environment</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="loves" value="fun-activities">
+                            <span>Fun Activities</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="loves" value="good-communication">
+                            <span>Good Communication</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="loves" value="clean-facilities">
+                            <span>Clean Facilities</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="loves" value="child-progress">
+                            <span>Child's Progress</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Your Thoughts</h3>
+                    <div class="form-group">
+                        <label for="improvements">What can we improve? Any suggestions?</label>
+                        <textarea id="improvements" name="improvements"
+                            placeholder="Share your thoughts on how we can make our school even better..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Additional Comments</h3>
+                    <div class="form-group">
+                        <label for="additional">Anything else you'd like to share?</label>
+                        <textarea id="additional" name="additional"
+                            placeholder="Any other feedback, compliments, or concerns..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="recommend" value="yes">
+                            <span>I would recommend this school to other parents</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Feedback ✨</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="thank-you" id="thankYou">
+        <h2>Thank You! 🎉</h2>
+        <p>Your feedback is invaluable to us. We appreciate you taking the time to help us improve!</p>
+        <p>We'll review your suggestions and work hard to make our school even better for your child.</p>
+        <div> <button class="submit-btn" onclick="window.location.href='/'">Back to Home</button></div>
+    </div>
+</body>
+<script src="feedback.js"></script>
+
+</html>
