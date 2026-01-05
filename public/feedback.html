@@ -74,10 +74,11 @@
                         <label for="childClass">Class/Age Group <span class="required">*</span></label>
                         <select id="childClass" name="childClass" required>
                             <option value="">Select Class</option>
-                            <option value="nursery">Nursery (2-3 years)</option>
-                            <option value="junior-kg">Junior KG (3-4 years)</option>
-                            <option value="senior-kg">Senior KG (4-5 years)</option>
-                            <option value="prep">Prep (5-6 years)</option>
+                            <option value="pre-nursery">Pre Nursery</option>
+                            <option value="nursery">Nursery</option>
+                            <option value="junior-kg">LKG</option>
+                            <option value="senior-kg">UKG</option>
+
                         </select>
                     </div>
                 </div>
@@ -241,12 +242,25 @@
 
                 <div class="form-section">
                     <div class="form-group">
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="recommend" value="yes">
-                            <span>I would recommend this school to other parents</span>
+                        <label for="recommendation_level">
+                            I would recommend this school to other parents
                         </label>
+                        <div class="recommendation_level">
+                            <input type="radio" name="recommendation_level" value="yes"> Yes
+                            <input type="radio" name="recommendation_level" value="no"> No
+                        </div>
                     </div>
                 </div>
+                <style>
+                    .recommendation_level {
+                        padding: 15px;
+                        border: 2px solid #e0e0e0;
+                        border-radius: 10px;
+                        font-size: 16px;
+                        transition: all 0.3s ease;
+                        background: #fafafa;
+                    }
+                </style>
 
                 <button type="submit" class="submit-btn">Submit Feedback ✨</button>
             </form>

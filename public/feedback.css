@@ -368,7 +368,7 @@ textarea {
     color: #333;
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 3px solid #667eea;
+    /* border-bottom: 3px solid #667eea; */
     display: inline-block;
 }
 
