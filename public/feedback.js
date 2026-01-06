@@ -174,6 +174,19 @@ document
       return;
     }
 
+    // Validate email format if not anonymous and email is provided
+    const isAnonymous = document.getElementById("anonymous").checked;
+    const emailInput = document.getElementById("email");
+    if (!isAnonymous && emailInput.value.trim()) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(emailInput.value.trim())) {
+        alert("Please enter a valid email address (e.g., name@example.com)");
+        emailInput.focus();
+        emailInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+    }
+
     // Validate "What do you love most"
     const selectedLoves = document.querySelectorAll(
       'input[name="loves"]:checked'
@@ -211,22 +224,41 @@ document
       formData.append(`rating_${key}`, value);
     }
 
-    // Create formatted message for email
-    let emailMessage = "=== PLAY SCHOOL FEEDBACK FORM ===\n\n";
+    // Create formatted message for email with improved readability
+    let emailMessage = "";
+    
+    // Header with visual separator
+    emailMessage += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    emailMessage += "       🌟 LITTLE WINGS PLAY SCHOOL FEEDBACK 🌟\n";
+    emailMessage += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
 
-    // Basic Info
+    // Submission Details
+    emailMessage += `📅 Submitted: ${new Date().toLocaleString('en-IN', { 
+      dateStyle: 'full', 
+      timeStyle: 'short',
+      timeZone: 'Asia/Kolkata'
+    })}\n\n`;
+
+    // Basic Info Section
+    emailMessage += "┌─────────────────────────────────────────────────────┐\n";
+    emailMessage += "│  👤 PARENT & CHILD INFORMATION                      │\n";
+    emailMessage += "└─────────────────────────────────────────────────────┘\n\n";
+    
     if (!document.getElementById("anonymous").checked) {
-      emailMessage += `Parent Name: ${formData.get("parentName") || "N/A"}\n`;
-      emailMessage += `Child Name: ${formData.get("childName") || "N/A"}\n`;
-      emailMessage += `Email: ${formData.get("email") || "N/A"}\n`;
+      emailMessage += `   Parent/Guardian: ${formData.get("parentName") || "N/A"}\n`;
+      emailMessage += `   Child's Name:    ${formData.get("childName") || "N/A"}\n`;
+      emailMessage += `   Email:           ${formData.get("email") || "N/A"}\n`;
+      emailMessage += `   Class/Age Group: ${formData.get("childClass") || "N/A"}\n\n`;
     } else {
-      emailMessage += "ANONYMOUS FEEDBACK\n";
+      emailMessage += "   🔒 ANONYMOUS FEEDBACK\n";
+      emailMessage += `   Class/Age Group: ${formData.get("childClass") || "N/A"}\n\n`;
     }
 
-    emailMessage += `Class: ${formData.get("childClass") || "N/A"}\n\n`;
-
-    // Ratings
-    emailMessage += "=== RATINGS ===\n";
+    // Ratings Section
+    emailMessage += "┌─────────────────────────────────────────────────────┐\n";
+    emailMessage += "│  ⭐ SERVICE RATINGS                                 │\n";
+    emailMessage += "└─────────────────────────────────────────────────────┘\n\n";
+    
     const ratingLabels = {
       teaching: "Teaching Quality",
       safety: "Safety & Security",
@@ -239,42 +271,64 @@ document
     for (const [key, label] of Object.entries(ratingLabels)) {
       const rating = ratings[key] || 0;
       const stars = "⭐".repeat(rating);
-      emailMessage += `${label}: ${stars} (${rating}/5)\n`;
+      const emptyStars = "☆".repeat(5 - rating);
+      const paddedLabel = label.padEnd(28, ' ');
+      emailMessage += `   ${paddedLabel} ${stars}${emptyStars} (${rating}/5)\n`;
     }
+    emailMessage += "\n";
 
     // What they love
-    emailMessage += "\n=== WHAT THEY LOVE ===\n";
+    emailMessage += "┌─────────────────────────────────────────────────────┐\n";
+    emailMessage += "│  💚 WHAT THEY LOVE MOST                             │\n";
+    emailMessage += "└─────────────────────────────────────────────────────┘\n\n";
+    
     const loves = formData.getAll("loves");
     if (loves.length > 0) {
       loves.forEach((love) => {
-        emailMessage += `• ${love.replace("-", " ").toUpperCase()}\n`;
+        const formatted = love.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+        emailMessage += `   ✓ ${formatted}\n`;
       });
     } else {
-      emailMessage += "No specific aspects mentioned\n";
+      emailMessage += "   (No specific aspects selected)\n";
+    }
+    emailMessage += "\n";
+
+    // Improvements Section
+    const improvements = formData.get("improvements");
+    if (improvements && improvements.trim()) {
+      emailMessage += "┌─────────────────────────────────────────────────────┐\n";
+      emailMessage += "│  💡 SUGGESTIONS FOR IMPROVEMENT                     │\n";
+      emailMessage += "└─────────────────────────────────────────────────────┘\n\n";
+      emailMessage += `   ${improvements.trim()}\n\n`;
     }
 
-    // Dislikes
-    emailMessage += "\n=== WHAT DO YOU DISLIKE MOST ===\n";
-    emailMessage += (formData.get("dislikes") || "None provided") + "\n";
+    // Additional Comments Section
+    const additional = formData.get("additional");
+    if (additional && additional.trim()) {
+      emailMessage += "┌─────────────────────────────────────────────────────┐\n";
+      emailMessage += "│  💬 ADDITIONAL COMMENTS                             │\n";
+      emailMessage += "└─────────────────────────────────────────────────────┘\n\n";
+      emailMessage += `   ${additional.trim()}\n\n`;
+    }
 
-    // Improvements
-    emailMessage += "\n=== SUGGESTIONS FOR IMPROVEMENT ===\n";
-    emailMessage += (formData.get("improvements") || "None provided") + "\n";
+    // Recommendation Section
+    emailMessage += "┌─────────────────────────────────────────────────────┐\n";
+    emailMessage += "│  🎯 RECOMMENDATION                                  │\n";
+    emailMessage += "└─────────────────────────────────────────────────────┘\n\n";
+    
+    const recommendLevel = formData.get("recommendation_level");
+    if (recommendLevel === "yes") {
+      emailMessage += "   ✅ YES - Would recommend to other parents\n\n";
+    } else if (recommendLevel === "no") {
+      emailMessage += "   ❌ NO - Would not recommend to other parents\n\n";
+    } else {
+      emailMessage += "   (Not specified)\n\n";
+    }
 
-    // Additional comments
-    emailMessage += "\n=== ADDITIONAL COMMENTS ===\n";
-    emailMessage += (formData.get("additional") || "None provided") + "\n";
-
-    // Recommendation
-    emailMessage += "\n=== RECOMMENDATION ===\n";
-    emailMessage += formData.get("recommend")
-      ? "✅ Would recommend to other parents"
-      : "❌ Would not recommend";
-
-    emailMessage += formData.get("recommendation_level")
-      ? "✅ Would recommend to other parents"
-      : "❌ Would not recommend";
-    emailMessage += `\n\nSubmitted on: ${new Date().toLocaleString()}`;
+    // Footer
+    emailMessage += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    emailMessage += "         Thank you for your valuable feedback!\n";
+    emailMessage += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
     // Add formatted message to form data
     formData.append("message", emailMessage);
