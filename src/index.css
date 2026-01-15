@@ -145,3 +145,13 @@
     @apply rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1;
   }
 }
+
+/* Global support to hide Elfsight branding */
+a[href*="elfsight.com/google-reviews-widget"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
