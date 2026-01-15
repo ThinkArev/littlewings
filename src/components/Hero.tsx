@@ -141,8 +141,8 @@ const Hero = () => {
               learn, and grow through play-based learning and Montessori methods.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/admissions#applyNow">
+            <div className="flex flex-col md:flex-col lg:flex-row gap-4 justify-center lg:justify-start">
+              <Link to="/join#applyNow">
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-playful-orange to-coral text-white hover:from-coral hover:to-playful-orange text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 button-playful"
@@ -163,7 +163,7 @@ const Hero = () => {
                     📅 Schedule a Visit
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-[90vw] max-h-[65vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center">
                       <Calendar className="mr-3 w-6 h-6 text-baby-blue" />

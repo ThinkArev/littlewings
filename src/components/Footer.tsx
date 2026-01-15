@@ -1,15 +1,16 @@
 import React from "react";
 import { Heart, MapPin, Phone, Mail, Clock } from "lucide-react";
 import littlewingslogo from "@/assets/littlewingsUpdated.png";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const quickLinks = [
-    { name: "Home", href: "#home" },
-    { name: "About Us", href: "#about" },
-    { name: "Programs", href: "#programs" },
-    { name: "Gallery", href: "#gallery" },
-    { name: "Admissions", href: "#admissions" },
-    { name: "Contact", href: "#contact" },
+    { name: "Home", href: "/home" },
+    { name: "About Us", href: "/about" },
+    { name: "Programs", href: "/programs" },
+    { name: "Gallery", href: "/gallery" },
+    { name: "Admissions", href: "/admissions" },
+    { name: "Contact", href: "/contact" },
   ];
 
   const programs = [
@@ -22,7 +23,7 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-gray-800 to-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-8">
           {/* School Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
@@ -49,24 +50,24 @@ const Footer = () => {
               <span>for little ones</span>
             </div>
           </div>
-
+        </div>    
           {/* Quick Links */}
-          <div>
+          {/* <div>
             <h4 className="text-lg font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-gray-300 hover:text-baby-blue transition-colors duration-200"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
-          </div>
-
+          </div> */}
+       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Programs */}
           <div>
             <h4 className="text-lg font-semibold mb-6">Our Programs</h4>

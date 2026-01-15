@@ -155,10 +155,15 @@ const Contact = () => {
   return (
     <section
       id="contact"
-      className="py-12 md:py-20 bg-gradient-to-br from-mint-green/10 to-white"
+      className="pb-12 pt-4 md:pt-4 md:pb-20 bg-gradient-to-br from-mint-green/10 to-white"
     >
+      {/* Section Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+
+        {/* Google Reviews - Trust Signal Before Contact Form */}
+        {/* Google Reviews Embed */}
+        <GoogleReviews />
+
         <div className="text-center mb-8 md:mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 md:mb-6">
             Get In{" "}
@@ -171,14 +176,9 @@ const Contact = () => {
             schedule a visit to our school.
           </p>
         </div>
-
-        {/* Google Reviews - Trust Signal Before Contact Form */}
-        <GoogleReviews />
-
         <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-12 mt-8">
           {/* Contact Information */}
-          {/* Google Reviews Embed */}
-          <div className="space-y-4 md:space-y-8 rounded-lg bg-card text-card-foreground bg-gradient-to-br from-baby-blue/20 to-mint-green/20 border-0 shadow-lg">
+          <div className="">
             <h4 className="text-xl font-bold text-gray-800 mb-4 text-center">Visit us</h4>
             <div className="bg-white rounded-2xl overflow-hidden shadow-lg">
               {/* Google Reviews Embed - Shows real reviews */}
@@ -208,6 +208,7 @@ const Contact = () => {
               </div>
             </div>
           </div>
+
           <div className="space-y-4 md:space-y-8">
             <Card className="bg-gradient-to-br from-baby-blue/20 to-mint-green/20 border-0 shadow-lg">
               <CardContent className="p-4 md:p-8">
@@ -284,8 +285,10 @@ const Contact = () => {
             {/* Google Maps Placeholder */}
 
           </div>
+
         </div>
-          {/* Inquiry Form */}
+
+        {/* Inquiry Form */}
           <div>
             <Card className="bg-white border-0 shadow-xl">
               <CardContent className="p-4 md:p-8">

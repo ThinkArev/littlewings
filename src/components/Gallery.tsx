@@ -104,7 +104,7 @@ const Gallery = ({ limit }: GalleryProps) => {
   };
 
   return (
-    <section id="gallery" className="py-12 md:py-20 bg-gradient-to-br from-white to-sunshine-yellow/10">
+    <section id="gallery" className="py-8 md:py-8 bg-gradient-to-br from-white to-sunshine-yellow/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-8 md:mb-16">
