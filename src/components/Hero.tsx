@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Heart, Smile, Calendar, Clock, User, Phone, Mail } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowRight, Star, Heart, Smile, Calendar, Clock, User, Phone, Mail, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 import heroCreativeArts from "@/assets/hero-creative-arts.png";
 import heroEarlyLearning from "@/assets/hero-early-learning.png";
 import heroPhysicalPlay from "@/assets/hero-physical-play.png";
@@ -23,25 +24,73 @@ const Hero = () => {
     message: ''
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isRobotChecked, setIsRobotChecked] = useState(false);
   const { toast } = useToast();
 
-  const handleVisitFormSubmit = (e: React.FormEvent) => {
+  const handleVisitFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Visit Scheduled!",
-      description: "Thank you! We'll contact you soon to confirm your visit details.",
-    });
-    setVisitForm({
-      parentName: '',
-      childName: '',
-      childAge: '',
-      phone: '',
-      email: '',
-      preferredDate: '',
-      preferredTime: '',
-      message: ''
-    });
-    setIsDialogOpen(false);
+    
+    // Robot check
+    if (!isRobotChecked) {
+      toast({
+        title: "Captcha Required",
+        description: "Please confirm you are not a robot.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData();
+      Object.entries(visitForm).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      formData.append("_subject", "New Visit Schedule Request - Little Wings");
+      formData.append("_template", "table");
+      formData.append("_captcha", "false");
+
+      const response = await fetch("https://formsubmit.co/ajax/littlewingsplayschool25@gmail.com", {
+        method: "POST",
+        body: formData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setShowSuccess(true);
+        setIsDialogOpen(false);
+        setVisitForm({
+          parentName: '',
+          childName: '',
+          childAge: '',
+          phone: '',
+          email: '',
+          preferredDate: '',
+          preferredTime: '',
+          message: ''
+        });
+        setIsRobotChecked(false);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to schedule visit. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An expected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleVisitFormChange = (field: string, value: string) => {
@@ -93,19 +142,15 @@ const Hero = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-playful-orange to-coral text-white hover:from-coral hover:to-playful-orange text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 button-playful"
-                onClick={() => {
-                  const el = document.getElementById("admission-form-latest");
-                  if (el) {
-                    el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-              >
-                🎉 Admissions Open - Apply Free
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <Link to="/admissions#applyNow">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-playful-orange to-coral text-white hover:from-coral hover:to-playful-orange text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 button-playful"
+                >
+                  🎉 Admissions Open - Apply Free
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
@@ -132,6 +177,7 @@ const Hero = () => {
                         <Label htmlFor="parent-name">Parent/Guardian Name *</Label>
                         <Input
                           id="parent-name"
+                          disabled={isSubmitting}
                           value={visitForm.parentName}
                           onChange={(e) => handleVisitFormChange('parentName', e.target.value)}
                           required
@@ -143,6 +189,7 @@ const Hero = () => {
                         <Label htmlFor="child-name">Child's Name *</Label>
                         <Input
                           id="child-name"
+                          disabled={isSubmitting}
                           value={visitForm.childName}
                           onChange={(e) => handleVisitFormChange('childName', e.target.value)}
                           required
@@ -157,6 +204,7 @@ const Hero = () => {
                         <Label htmlFor="child-age">Child's Age *</Label>
                         <Input
                           id="child-age"
+                          disabled={isSubmitting}
                           value={visitForm.childAge}
                           onChange={(e) => handleVisitFormChange('childAge', e.target.value)}
                           required
@@ -169,6 +217,7 @@ const Hero = () => {
                         <Input
                           id="phone"
                           type="tel"
+                          disabled={isSubmitting}
                           value={visitForm.phone}
                           onChange={(e) => handleVisitFormChange('phone', e.target.value)}
                           required
@@ -181,6 +230,7 @@ const Hero = () => {
                         <Input
                           id="email"
                           type="email"
+                          disabled={isSubmitting}
                           value={visitForm.email}
                           onChange={(e) => handleVisitFormChange('email', e.target.value)}
                           className="mt-1"
@@ -195,6 +245,7 @@ const Hero = () => {
                         <Input
                           id="preferred-date"
                           type="date"
+                          disabled={isSubmitting}
                           value={visitForm.preferredDate}
                           onChange={(e) => handleVisitFormChange('preferredDate', e.target.value)}
                           required
@@ -206,6 +257,7 @@ const Hero = () => {
                         <Input
                           id="preferred-time"
                           type="time"
+                          disabled={isSubmitting}
                           value={visitForm.preferredTime}
                           onChange={(e) => handleVisitFormChange('preferredTime', e.target.value)}
                           required
@@ -217,11 +269,12 @@ const Hero = () => {
                     <div>
                       <Label htmlFor="message">Additional Message</Label>
                       <Textarea
-                        id="message"
+                        id="visit-message"
+                        disabled={isSubmitting}
                         value={visitForm.message}
                         onChange={(e) => handleVisitFormChange('message', e.target.value)}
                         className="mt-1"
-                        placeholder="Any specific questions or requirements..."
+                        placeholder="Any specific questions? (Optional)"
                         rows={3}
                       />
                     </div>
@@ -239,12 +292,34 @@ const Hero = () => {
                       </ul>
                     </div>
 
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-gradient-to-r from-baby-blue to-mint-green text-white hover:from-mint-green hover:to-baby-blue text-lg py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    {/* Anti-DDoS Capacitor Checkbox */}
+                    <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      <input 
+                        type="checkbox" 
+                        id="visit-robot-check" 
+                        checked={isRobotChecked}
+                        onChange={(e) => setIsRobotChecked(e.target.checked)}
+                        disabled={isSubmitting}
+                        className="w-5 h-5 text-baby-blue border-gray-300 rounded focus:ring-baby-blue cursor-pointer"
+                      />
+                      <Label htmlFor="visit-robot-check" className="cursor-pointer font-medium text-gray-700">
+                        I am not a robot
+                      </Label>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-gradient-to-r from-baby-blue to-mint-green text-white hover:from-mint-green hover:to-baby-blue py-6 text-lg rounded-xl shadow-md transition-all disabled:opacity-50"
                     >
-                      <Calendar className="mr-2 w-5 h-5" />
-                      Schedule My Visit
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                          Scheduling...
+                        </>
+                      ) : (
+                        "Confirm Visit Request"
+                      )}
                     </Button>
                   </form>
                 </DialogContent>
@@ -321,6 +396,41 @@ const Hero = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="sm:max-w-md p-8 md:p-12">
+          <DialogHeader className="space-y-4">
+            <DialogTitle className="text-3xl font-bold text-center text-gray-800">
+              📋 Visit Request Sent!
+            </DialogTitle>
+            <DialogDescription className="text-center text-xl text-gray-600 font-medium">
+              We have received your request to schedule a visit.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-6">
+            <p className="text-center text-gray-500 text-lg">
+              Our team will contact you shortly to confirm the appointment.
+            </p>
+            <div className="flex flex-col gap-4">
+              <Link to="/gallery" onClick={() => setShowSuccess(false)}>
+                <Button className="w-full bg-gradient-to-r from-baby-blue to-mint-green hover:from-mint-green hover:to-baby-blue text-white py-6 text-lg rounded-xl shadow-md transition-all">
+                  📸 View Gallery
+                </Button>
+              </Link>
+              <a 
+                href="https://www.instagram.com/littlewingsplayschooll/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-purple-600 hover:to-pink-500 text-white py-6 text-lg rounded-xl shadow-md transition-all">
+                  📱 Follow on Instagram
+                </Button>
+              </a>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

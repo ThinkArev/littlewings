@@ -1,5 +1,6 @@
 import React from "react";
 import { Heart, MapPin, Phone, Mail, Clock } from "lucide-react";
+import littlewingslogo from "@/assets/littlewingsUpdated.png";
 
 const Footer = () => {
   const quickLinks = [
@@ -26,7 +27,12 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-baby-blue to-mint-green rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">LW</span>
+                {/* <span className="text-white font-bold text-lg">LW</span> */}
+                 <img
+                src={littlewingslogo}
+                alt="Little Wings Logo"
+                className="h-[60px] min-w-[55px] border-2 border-[#FFF0F5] rounded-full"
+              />
               </div>
               <div>
                 <h3 className="text-xl font-bold">Little Wings</h3>

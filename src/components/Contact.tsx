@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Mail, Clock, Send, ExternalLink } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, ExternalLink, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 import GoogleReviews from "@/components/GoogleReviews";
 import {
   validateEmail,
@@ -32,10 +34,13 @@ const Contact = () => {
     message: "",
   });
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isRobotChecked, setIsRobotChecked] = useState(false);
 
-    // Reset errors
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     const newErrors = {
       name: "",
       email: "",
@@ -70,25 +75,73 @@ const Contact = () => {
       return;
     }
 
-    // Sanitize all inputs before submission
-    const sanitizedData = {
-      name: sanitizeInput(inquiryForm.name),
-      email: sanitizeInput(inquiryForm.email),
-      phone: sanitizeInput(inquiryForm.phone),
-      subject: sanitizeInput(inquiryForm.subject),
-      message: sanitizeInput(inquiryForm.message),
-    };
+    // Robot check
+    if (!isRobotChecked) {
+      toast({
+        title: "Captcha Required",
+        description: "Please confirm you are not a robot.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    // Submit to FormSubmit.co
-    const form = e.target as HTMLFormElement;
-    form.action = "https://formsubmit.co/littlewingsplayschool25@gmail.com";
-    form.method = "POST";
+    // Submit via AJAX
+    setIsSubmitting(true);
     
-    // Form will submit naturally after validation
-    toast({
-      title: "Sending...",
-      description: "Your inquiry is being submitted.",
-    });
+    try {
+      const formData = new FormData();
+      formData.append("name", sanitizeInput(inquiryForm.name));
+      formData.append("email", sanitizeInput(inquiryForm.email));
+      formData.append("phone", sanitizeInput(inquiryForm.phone));
+      formData.append("subject", sanitizeInput(inquiryForm.subject));
+      formData.append("message", sanitizeInput(inquiryForm.message));
+      formData.append("_subject", "New Contact Inquiry - Little Wings Play School");
+      formData.append("_template", "table");
+      formData.append("_captcha", "false");
+
+      const response = await fetch("https://formsubmit.co/ajax/littlewingsplayschool25@gmail.com", {
+        method: "POST",
+        body: formData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setShowSuccess(true);
+        setInquiryForm({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+        setErrors({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
+        toast({
+          title: "Success!",
+          description: "Your message has been sent. We'll get back to you soon.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send message. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: keyof typeof inquiryForm, value: string) => {
@@ -245,23 +298,13 @@ const Contact = () => {
                   </h3>
                 </div>
 
-                <form 
-                  action="https://formsubmit.co/littlewingsplayschool25@gmail.com" 
-                  method="POST"
-                  onSubmit={handleInquirySubmit} 
-                  className="space-y-4 md:space-y-6"
-                >
-                  {/* FormSubmit.co Configuration */}
-                  <input type="hidden" name="_captcha" value="true" />
-                  <input type="hidden" name="_template" value="table" />
-                  <input type="hidden" name="_subject" value="New Contact Inquiry - Little Wings Play School" />
-                  <input type="hidden" name="_next" value={`${window.location.origin}/contact?submitted=true`} />
-                  
+                <form onSubmit={handleInquirySubmit} className="space-y-4 md:space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="inquiry-name">Your Name *</Label>
                       <Input
                         id="inquiry-name"
+                        disabled={isSubmitting}
                         value={inquiryForm.name}
                         onChange={(e) =>
                           handleInputChange("name", e.target.value)
@@ -279,6 +322,7 @@ const Contact = () => {
                       <Input
                         id="inquiry-phone"
                         type="tel"
+                        disabled={isSubmitting}
                         value={inquiryForm.phone}
                         onChange={(e) =>
                           handleInputChange("phone", e.target.value)
@@ -298,6 +342,7 @@ const Contact = () => {
                     <Input
                       id="inquiry-email"
                       type="email"
+                      disabled={isSubmitting}
                       value={inquiryForm.email}
                       onChange={(e) =>
                         handleInputChange("email", e.target.value)
@@ -315,6 +360,7 @@ const Contact = () => {
                     <Label htmlFor="inquiry-subject">Subject</Label>
                     <Input
                       id="inquiry-subject"
+                      disabled={isSubmitting}
                       value={inquiryForm.subject}
                       onChange={(e) =>
                         handleInputChange("subject", e.target.value)
@@ -328,6 +374,7 @@ const Contact = () => {
                     <Label htmlFor="inquiry-message">Message *</Label>
                     <Textarea
                       id="inquiry-message"
+                      disabled={isSubmitting}
                       value={inquiryForm.message}
                       onChange={(e) =>
                         handleInputChange("message", e.target.value)
@@ -342,12 +389,37 @@ const Contact = () => {
                     )}
                   </div>
 
+                  {/* Anti-DDoS Capacitor Checkbox */}
+                  <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <input 
+                      type="checkbox" 
+                      id="robot-check" 
+                      checked={isRobotChecked}
+                      onChange={(e) => setIsRobotChecked(e.target.checked)}
+                      disabled={isSubmitting}
+                      className="w-5 h-5 text-baby-blue border-gray-300 rounded focus:ring-baby-blue cursor-pointer"
+                    />
+                    <Label htmlFor="robot-check" className="cursor-pointer font-medium text-gray-700">
+                      I am not a robot
+                    </Label>
+                  </div>
+
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-mint-green to-baby-blue text-white hover:from-baby-blue hover:to-mint-green text-lg py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-mint-green to-baby-blue text-white hover:from-baby-blue hover:to-mint-green text-lg py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Send Message
-                    <Send className="ml-2 w-5 h-5" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <Send className="ml-2 w-5 h-5" />
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>
@@ -373,6 +445,41 @@ const Contact = () => {
             </div>
           </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="sm:max-w-md p-8 md:p-12">
+          <DialogHeader className="space-y-4">
+            <DialogTitle className="text-3xl font-bold text-center text-gray-800">
+              ✅ Success!
+            </DialogTitle>
+            <DialogDescription className="text-center text-xl text-gray-600 font-medium">
+              Your inquiry has been submitted successfully.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-6">
+            <p className="text-center text-gray-500 text-lg">
+              We'll get back to you shortly. In the meantime, feel free to explore our school!
+            </p>
+            <div className="flex flex-col gap-4">
+              <Link to="/gallery" onClick={() => setShowSuccess(false)}>
+                <Button className="w-full bg-gradient-to-r from-baby-blue to-mint-green hover:from-mint-green hover:to-baby-blue text-white py-6 text-lg rounded-xl shadow-md transition-all">
+                  📸 Explore Gallery
+                </Button>
+              </Link>
+              <a 
+                href="https://www.instagram.com/littlewingsplayschooll/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-purple-600 hover:to-pink-500 text-white py-6 text-lg rounded-xl shadow-md transition-all">
+                  📱 Follow us on Instagram
+                </Button>
+              </a>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

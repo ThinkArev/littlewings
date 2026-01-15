@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,11 @@ import {
   Users,
   Phone,
   Mail,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 import {
   validateEmail,
   validateIndianMobile,
@@ -48,9 +51,25 @@ const Admissions = () => {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Scroll to applyNow section if hash is present
+  useEffect(() => {
+    if (window.location.hash === '#applyNow') {
+      setTimeout(() => {
+        const element = document.getElementById('applyNow');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, []);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isRobotChecked, setIsRobotChecked] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     // Reset errors
     const newErrors = {
       childName: "",
@@ -94,27 +113,79 @@ const Admissions = () => {
       return;
     }
 
-    // Sanitize all inputs
-    const sanitizedData = {
-      childName: sanitizeInput(formData.childName),
-      parentName: sanitizeInput(formData.parentName),
-      email: sanitizeInput(formData.email),
-      phone: sanitizeInput(formData.phone),
-      childAge: sanitizeInput(formData.childAge),
-      program: formData.program,
-      message: sanitizeInput(formData.message),
-    };
+    // Robot check
+    if (!isRobotChecked) {
+      toast({
+        title: "Captcha Required",
+        description: "Please confirm you are not a robot.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    // Submit to FormSubmit.co
-    const form = e.target as HTMLFormElement;
-    form.action = "https://formsubmit.co/littlewingsplayschool25@gmail.com";
-    form.method = "POST";
+    // Submit via AJAX
+    setIsSubmitting(true);
     
-    // Form will submit naturally after validation
-    toast({
-      title: "Submitting...",
-      description: "Your admission application is being submitted.",
-    });
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("childName", sanitizeInput(formData.childName));
+      formDataToSend.append("parentName", sanitizeInput(formData.parentName));
+      formDataToSend.append("email", sanitizeInput(formData.email));
+      formDataToSend.append("phone", sanitizeInput(formData.phone));
+      formDataToSend.append("childAge", sanitizeInput(formData.childAge));
+      formDataToSend.append("program", formData.program);
+      formDataToSend.append("message", sanitizeInput(formData.message));
+      formDataToSend.append("_subject", "New Admission Application - Little Wings Play School");
+      formDataToSend.append("_template", "table");
+      formDataToSend.append("_captcha", "false");
+
+      const response = await fetch("https://formsubmit.co/ajax/littlewingsplayschool25@gmail.com", {
+        method: "POST",
+        body: formDataToSend,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setShowSuccess(true);
+        setFormData({
+          childName: "",
+          parentName: "",
+          email: "",
+          phone: "",
+          childAge: "",
+          program: "",
+          message: "",
+        });
+        setIsRobotChecked(false);
+        setErrors({
+          childName: "",
+          parentName: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
+        toast({
+          title: "Application Submitted!",
+          description: "We'll be in touch with you shortly.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to submit application. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit application. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (field: string, value: string) => {
@@ -210,7 +281,7 @@ const Admissions = () => {
         </div>
 
         {/* Admission Form */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-12 items-start" id="applyNow">
           <div>
             <Card className="bg-white border-0 shadow-xl">
               <CardContent className="p-8">
@@ -218,28 +289,22 @@ const Admissions = () => {
                   <div className="w-10 h-10 bg-gradient-to-br from-baby-blue to-mint-green rounded-full flex items-center justify-center">
                     <Users className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-800">
+                  <h3 className="text-2xl font-bold text-gray-800" >
                     Apply Now - It's Free!
                   </h3>
                 </div>
 
                 <form 
-                  action="https://formsubmit.co/littlewingsplayschool25@gmail.com" 
-                  method="POST"
                   onSubmit={handleSubmit} 
                   className="space-y-6"
                 >
-                  {/* FormSubmit.co Configuration */}
-                  <input type="hidden" name="_captcha" value="true" />
-                  <input type="hidden" name="_template" value="table" />
-                  <input type="hidden" name="_subject" value="New Admission Application - Little Wings Play School" />
-                  <input type="hidden" name="_next" value={`${window.location.origin}/admissions?submitted=true`} />
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="childName">Child's Name *</Label>
                       <Input
                         id="childName"
+                        disabled={isSubmitting}
                         value={formData.childName}
                         onChange={(e) =>
                           handleChange("childName", e.target.value)
@@ -256,6 +321,7 @@ const Admissions = () => {
                       <Label htmlFor="parentName">Parent's Name *</Label>
                       <Input
                         id="parentName"
+                        disabled={isSubmitting}
                         value={formData.parentName}
                         onChange={(e) =>
                           handleChange("parentName", e.target.value)
@@ -276,6 +342,7 @@ const Admissions = () => {
                       <Input
                         id="email"
                         type="email"
+                        disabled={isSubmitting}
                         value={formData.email}
                         onChange={(e) => handleChange("email", e.target.value)}
                         required
@@ -291,6 +358,7 @@ const Admissions = () => {
                       <Input
                         id="phone"
                         type="tel"
+                        disabled={isSubmitting}
                         value={formData.phone}
                         onChange={(e) => handleChange("phone", e.target.value)}
                         required
@@ -308,6 +376,7 @@ const Admissions = () => {
                       <Label htmlFor="childAge">Child's Age</Label>
                       <Input
                         id="childAge"
+                        disabled={isSubmitting}
                         value={formData.childAge}
                         onChange={(e) =>
                           handleChange("childAge", e.target.value)
@@ -319,6 +388,7 @@ const Admissions = () => {
                     <div>
                       <Label htmlFor="program">Preferred Program</Label>
                       <Select
+                        disabled={isSubmitting}
                         onValueChange={(value) =>
                           handleChange("program", value)
                         }
@@ -348,6 +418,7 @@ const Admissions = () => {
                     <Label htmlFor="message">Message (Optional)</Label>
                     <Textarea
                       id="message"
+                      disabled={isSubmitting}
                       value={formData.message}
                       onChange={(e) => handleChange("message", e.target.value)}
                       className={`mt-2 ${errors.message ? 'border-red-500' : ''}`}
@@ -359,11 +430,34 @@ const Admissions = () => {
                     )}
                   </div>
 
+                  {/* Anti-DDoS Capacitor Checkbox */}
+                  <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <input 
+                      type="checkbox" 
+                      id="robot-check" 
+                      checked={isRobotChecked}
+                      onChange={(e) => setIsRobotChecked(e.target.checked)}
+                      disabled={isSubmitting}
+                      className="w-5 h-5 text-coral border-gray-300 rounded focus:ring-coral cursor-pointer"
+                    />
+                    <Label htmlFor="robot-check" className="cursor-pointer font-medium text-gray-700">
+                      I am not a robot
+                    </Label>
+                  </div>
+
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-coral to-peach text-white hover:from-peach hover:to-coral text-lg py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-coral to-peach text-white hover:from-peach hover:to-coral text-lg py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit Application
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      "Submit Application"
+                    )}
                   </Button>
                 </form>
               </CardContent>
@@ -430,6 +524,41 @@ const Admissions = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="sm:max-w-md p-8 md:p-12">
+          <DialogHeader className="space-y-4">
+            <DialogTitle className="text-3xl font-bold text-center text-gray-800">
+              🎉 Application Received!
+            </DialogTitle>
+            <DialogDescription className="text-center text-xl text-gray-600 font-medium">
+              Your admission application has been submitted successfully.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-6">
+            <p className="text-center text-gray-500 text-lg">
+              Thank you for choosing Little Wings! We will review your application and contact you shortly.
+            </p>
+            <div className="flex flex-col gap-4">
+              <Link to="/gallery" onClick={() => setShowSuccess(false)}>
+                <Button className="w-full bg-gradient-to-r from-baby-blue to-mint-green hover:from-mint-green hover:to-baby-blue text-white py-6 text-lg rounded-xl shadow-md transition-all">
+                  📸 Explore Our Gallery
+                </Button>
+              </Link>
+              <a 
+                href="https://www.instagram.com/littlewingsplayschooll/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-purple-600 hover:to-pink-500 text-white py-6 text-lg rounded-xl shadow-md transition-all">
+                  📱 Follow us on Instagram
+                </Button>
+              </a>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
