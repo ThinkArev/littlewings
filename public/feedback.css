@@ -385,8 +385,40 @@ textarea {
         flex-direction: column;
     }
 
+    /* Headings - optimized for mobile readability */
     .header h1 {
-        font-size: 2em;
+        font-size: 1.75rem; /* 28px - better proportion for small screens */
+    }
+
+    .header p {
+        font-size: 1rem; /* 16px - cleaner and more readable */
+    }
+
+    .section-title {
+        font-size: 1.25rem; /* 20px - appropriate for section headers */
+    }
+
+    .thank-you h2 {
+        font-size: 1.75rem; /* 28px - reduced from 2.5em for mobile */
+    }
+
+    .thank-you p {
+        font-size: 1.1rem; /* 17.6px - slightly reduced for better fit */
+    }
+
+    /* Labels and text - standardized to 1rem */
+    label {
+        font-size: 1rem; /* 16px - cleaner and consistent */
+    }
+
+    .privacy-notice p {
+        font-size: 1rem; /* 16px - better readability */
+    }
+
+    /* Button - optimized touch target */
+    .submit-btn {
+        font-size: 1rem; /* 16px - better for mobile */
+        padding: 16px 32px;
     }
 
     .form-content {
